@@ -52,21 +52,23 @@ const mission_name = process.argv[2];
 
 console.log(`Mission ${mission_name}`);
 
+setTimeout(()=>{
+  if(mission_name ==='status'){
+    Mission.MissionApi.triggerStatusMission().then(()=>{
 
-if(mission_name ==='status'){
-  Mission.MissionApi.startTopicItemMission(false).then(()=>{
+    }).catch((err)=>{
 
-  }).catch((err)=>{
+    });
+  }
 
-  });
-}
-if(mission_name ==='comments'){
-  Mission.MissionApi.startStatusCommentMission(false).then(()=>{
+  if(mission_name ==='comments'){
+    Mission.MissionApi.triggerCommentMission().then(()=>{
 
-  }).catch((err)=>{
+    }).catch((err)=>{
 
-  });
-}
+    });
+  }
 
 
+},10000);
 

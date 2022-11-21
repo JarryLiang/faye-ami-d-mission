@@ -23,10 +23,16 @@ sudo apt-get install ca-certificates fonts-liberation libappindicator3-1 libasou
 
 
 ///
+sudo npm install pm2@latest -g
 
 use pm2
+
+pm2 start npm -- start
+
 
 pm2 startup systemd
 
 //
 https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-18-04
+
+https://www.tecmint.com/enable-pm2-to-auto-start-node-js-app/
