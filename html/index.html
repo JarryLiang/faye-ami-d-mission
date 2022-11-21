@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Site</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        body { padding-top: 50px; }
+    </style>
+</head>
+<script>
+  var handle = null;
+  function doMonitor(){
+    if(handle==null){
+      handle=setInterval(()=>{
+        fetch("/metrics").then((response)=>{
+          return response.json()
+        }).then((res)=>{
+          console.log(res);
+          document.querySelector("#mm").innerHTML=JSON.stringify(res,null,2);
+        });
+      },2000);
+    }
+  }
+  function doStartStatus(){
+    fetch("/startStatus",{method:"POST"}).then((response)=>{
+
+    });
+  }
+  function doStartComments(){
+    fetch("/startComment",{method:"POST"}).then((response)=>{
+
+    });
+
+  }
+  function doPauseMission(){
+    fetch("/stopMission",{method:"POST"}).then((response)=>{
+
+    });
+  }
+</script>
+
+<body>
+
+<div class="container">
+    <div class="jumbotron">
+        <button onclick="doMonitor()">Monitor</button>
+        <span>  </span>
+        <button onclick="doStartStatus()">Start Status</button>
+        <span>  </span>
+        <button onclick="doStartComments()">Start Comment</button>
+        <span>  </span>
+        <button onclick="doPauseMission()">Pause Mission</button>
+    </div>
+    <hr/>
+    <div>
+
+
+    </div>
+
+    <br/>
+    <div>
+        <pre id="mm">
+            display
+        </pre>
+    </div>
+</div>
+
+</body>
+</html>

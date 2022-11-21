@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "status": "node index.js status",
+    "comments": "node index.js comments",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

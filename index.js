@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express')
 const _MISSION_PORT = 3100;
 const app = express()
@@ -22,13 +23,50 @@ app.get("/metrics",(req,res)=>{
 });
 
 
+app.post("/startStatus",(req,res)=>{
+  Mission.MissionApi.triggerStatusMission();
+});
+
+app.post("/startComment",(req,res)=>{
+  Mission.MissionApi.triggerCommentMission();
+});
+
+app.post("/stopMission",(req,res)=>{
+  Mission.MissionApi.stopMission();
+});
+
+
+
+app.get("/",(req,res)=>{
+  const fn=path.resolve(__dirname,"./html/index.html");
+  res.sendFile(fn);
+});
+
+
 app.listen(_MISSION_PORT, () => {
   console.log(`Example app listening on port ${_MISSION_PORT}`)
 });
 
 
-Mission.MissionApi.startTopicItemMission(true).then(()=>{
+const mission_name = process.argv[2];
 
-}).catch((err)=>{
+console.log(`Mission ${mission_name}`);
 
-});
+
+if(mission_name ==='status'){
+  Mission.MissionApi.startTopicItemMission(false).then(()=>{
+
+  }).catch((err)=>{
+
+  });
+}
+if(mission_name ==='comments'){
+  Mission.MissionApi.startStatusCommentMission(false).then(()=>{
+
+  }).catch((err)=>{
+
+  });
+}
+
+
+
