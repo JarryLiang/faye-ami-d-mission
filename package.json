@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "pm2": "pm2 start index.js",
     "start": "node index.js",
     "status": "node index.js status",
     "comments": "node index.js comments",
@@ -23,6 +24,7 @@
     "node-fetch": "^3.3.0",
     "node-fetch-commonjs": "^3.2.4",
     "p-limit": "^4.0.0",
+    "pm2": "^5.2.2",
     "prom-client": "^14.1.0",
     "puppeteer": "^19.2.2"
   },

@@ -11,7 +11,10 @@ let _gBrowser = null;
 let _gPages = null;
 
 
-const CENTER_HOST = "http://127.0.0.1:4000";
+//const CENTER_HOST = "http://127.0.0.1:4000";
+const CENTER_HOST = "http://172.31.9.72:4000";
+
+
 
 let gStatus = {
   browserStatus:"N/A",
