@@ -2,6 +2,7 @@ const bb = require("../browser_util");
 
 const axios = require('axios');
 
+const G_WITH_HEAD = false;
 
 let intervalHandle = null;
 let gTopicExecute = false;
@@ -437,7 +438,7 @@ function triggerStatusMission(){
 
 
   gStatus.running_mission="status";
-  startTopicItemMission(false).then(()=>{}).catch((err)=>{
+  startTopicItemMission(G_WITH_HEAD).then(()=>{}).catch((err)=>{
     logError(err);
   });
 }
@@ -454,7 +455,7 @@ function triggerCommentMission(){
 
 
     gStatus.running_mission="comment";
-  startStatusCommentMission(false).then(()=>{}).catch((err)=>{
+  startStatusCommentMission(G_WITH_HEAD).then(()=>{}).catch((err)=>{
     logError(err);
   });
 
