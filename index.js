@@ -1,6 +1,6 @@
 const path = require('path');
 const express = require('express')
-const _MISSION_PORT = 3100;
+const _MISSION_PORT = 3000;
 const app = express()
 app.use(express.json());
 
