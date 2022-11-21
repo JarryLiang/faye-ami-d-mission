@@ -50,12 +50,7 @@ app.listen(_MISSION_PORT, () => {
 
 setTimeout(()=>{
 
-
-    Mission.MissionApi.triggerCommentMission().then(()=>{
-
-    }).catch((err)=>{
-
-    });
+    Mission.MissionApi.triggerCommentMission();
 
 
 },5000);

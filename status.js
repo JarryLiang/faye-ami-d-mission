@@ -43,6 +43,9 @@ app.get("/",(req,res)=>{
 });
 
 
+
+
+
 app.listen(_MISSION_PORT, () => {
   console.log(`Example app listening on port ${_MISSION_PORT}`)
 });
@@ -50,10 +53,6 @@ app.listen(_MISSION_PORT, () => {
 
 
 setTimeout(()=>{
-    Mission.MissionApi.triggerStatusMission().then(()=>{
-
-    }).catch((err)=>{
-
-    });
+  Mission.MissionApi.triggerStatusMission();
 },5000);
 
