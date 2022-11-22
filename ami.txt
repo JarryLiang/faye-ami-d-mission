@@ -29,10 +29,22 @@ use pm2
 
 pm2 start npm -- start
 
+pm2 start --name  xxxxx xxx.js
 
-pm2 startup systemd
+pm2 start --name faye-status status.js
+
+pm2 startup
+
+pm2 save
+
+
+//pm2 startup systemd
 
 //
 https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-18-04
 
 https://www.tecmint.com/enable-pm2-to-auto-start-node-js-app/
+
+
+#!/bin/bash
+echo "export fayehost=172.31.9.72" | sudo tee -a /etc/profile

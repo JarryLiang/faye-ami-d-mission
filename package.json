@@ -6,8 +6,8 @@
   "scripts": {
     "pm2": "pm2 start index.js",
     "start": "node index.js",
-    "status": "node index.js status",
-    "comments": "node index.js comments",
+    "status": "node status.js",
+    "comments": "node comments.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

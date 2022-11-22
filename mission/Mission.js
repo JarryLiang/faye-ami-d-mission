@@ -2,7 +2,7 @@ const bb = require("../browser_util");
 
 const axios = require('axios');
 
-const G_WITH_HEAD = false;
+const G_WITH_HEAD = true;
 
 let intervalHandle = null;
 let gTopicExecute = false;
@@ -19,7 +19,7 @@ let _gPages = null;
 function getMeteorHost(){
 
 
-  const defaultHost = "http://172.31.9.72";
+  const defaultHost = "http://127.0.0.1";
   const envHost =process.env.fayehost;
   if(envHost){
     return `http://${envHost}:4000`;
@@ -48,6 +48,11 @@ async function sleepPromise(ms) {
   })
 }
 
+function triggetStatusTime(){
+  gStatus.timeStr = new Date().toISOString();
+  gStatus.time = new Date().getTime();
+}
+
 function logError(r){
   gStatus.error=r;
 }
@@ -64,7 +69,7 @@ function registerBatchStep(info){
 }
 function registerCompleteTopic(info){
   gStatus.complete.push(info);
-  gStatus.count=gStatus.complete.length;
+  gStatus.count=gStatus.count+1;
 }
 
 function updateMissionStatus(info){
@@ -73,12 +78,17 @@ function updateMissionStatus(info){
 let batch = 0;
 function getMissionStatus(){
   const {
-    step,complete,...rest
+    step,complete,time,...rest
   } = gStatus;
+
+  const now = new Date().getTime();
+  const cc=complete.slice(-100).reverse();
   return {
     ...rest,
-    now:new Date().getTime(),
-    complete
+    now,
+    time,
+    diffTime: now - time,
+    complete:cc
   }
 }
 
@@ -117,6 +127,7 @@ function mergeItemsById(targetList, toAppend) {
 
 async function executeTopicStatusMission() {
 
+  triggetStatusTime();
   try {
 
     //fetch ...
@@ -154,6 +165,7 @@ async function executeTopicStatusMission() {
     const {name:topicName} = topic;
 
     for (let i = 0; i < 100; i++) {
+      triggetStatusTime();
       console.log(`loop i ${i}`);
       const obj = await page0.evaluate(async (opts) => {
         const {id,_cond} = opts;
@@ -243,7 +255,7 @@ async function executeTopicStatusMission() {
 
       } else {
         registerCompleteTopic(
-          `${jobTitle} - ${totalStatus}`
+          `${new Date().toISOString()}:${jobTitle} - ${totalStatus}  `
         );
         break;
       }
@@ -304,7 +316,7 @@ async function executeStatusCommentMission() {
 
   const submitUrl = `${getMeteorHost()}/submitStatusComments`;
 
-
+  triggetStatusTime();
   const jo = await fetchStatusWork();
 
   //console.log(JSON.stringify(jo,null,2));
@@ -352,6 +364,7 @@ async function executeStatusCommentMission() {
     }
   });
 
+  triggetStatusTime();
   const {comments} = obj;
   let comments_count = 0;
   if(comments){
@@ -378,7 +391,7 @@ async function executeStatusCommentMission() {
   }
 
   registerCompleteTopic(
-    `${jobTitle} -- ${comments_count}`
+    `${new Date().toISOString()}:${jobTitle} -- ${comments_count}  `
   );
   updateMissionStatus({
     current: jobTitle,
