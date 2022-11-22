@@ -13,9 +13,19 @@ let _gPages = null;
 
 
 //const CENTER_HOST = "http://127.0.0.1:4000";
-const CENTER_HOST = "http://172.31.9.72:4000";
 
 
+
+function getMeteorHost(){
+
+
+  const defaultHost = "http://172.31.9.72";
+  const envHost =process.env.fayehost;
+  if(envHost){
+    return `http://${envHost}:4000`;
+  }
+  return `${defaultHost}:4000`;
+}
 
 let gStatus = {
   browserStatus:"N/A",
@@ -82,7 +92,7 @@ async function initBrowser(visible) {
 }
 
 async function fetchTopicWork() {
-  const url = `${CENTER_HOST}/galleryTopicWorks`;
+  const url = `${getMeteorHost()}/galleryTopicWorks`;
   //const resp =await fetch(url,{method: 'GET'});
   //const json = await resp.json();
   const response = await axios.post(url, {}, {});
@@ -131,7 +141,7 @@ async function executeTopicStatusMission() {
     await bb.browserApi.prepareScript(page0, "../injects/inject_gallery_topic_items.js");
     gStatus.browserStatus="douban loaded";
 
-    const url = `${CENTER_HOST}/submitGalleryTopicWorks`;
+    const url = `${getMeteorHost()}/submitGalleryTopicWorks`;
 
 
     let cond = {};
@@ -285,14 +295,14 @@ async function startTopicItemMission(visible) {
 
  *********************************************/
 async function fetchStatusWork() {
-  const url = `${CENTER_HOST}/galleryStatusWorks`;
+  const url = `${getMeteorHost()}/galleryStatusWorks`;
   const response = await axios.post(url, {}, {});
   return response.data;
 }
 
 async function executeStatusCommentMission() {
 
-  const submitUrl = `${CENTER_HOST}/submitStatusComments`;
+  const submitUrl = `${getMeteorHost()}/submitStatusComments`;
 
 
   const jo = await fetchStatusWork();
@@ -468,5 +478,7 @@ exports.MissionApi = {
   triggerCommentMission,
   startTopicItemMission,
   startStatusCommentMission,
-  getMissionStatus
+  getMissionStatus,
+  getMeteorHost
+
 }

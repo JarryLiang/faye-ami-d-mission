@@ -52,6 +52,7 @@ const mission_name = process.argv[2];
 
 console.log(`Mission ${mission_name}`);
 
+/*
 setTimeout(()=>{
   if(mission_name ==='status'){
     Mission.MissionApi.triggerStatusMission().then(()=>{
@@ -68,7 +69,7 @@ setTimeout(()=>{
 
     });
   }
-
-
 },10000);
+*/
 
+console.log(Mission.MissionApi.getMeteorHost());
