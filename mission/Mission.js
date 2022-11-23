@@ -1,5 +1,5 @@
 const bb = require("../browser_util");
-
+var sequence = require('promise-sequence');
 const axios = require('axios');
 
 const G_WITH_HEAD = false;
@@ -307,34 +307,19 @@ async function startTopicItemMission(visible) {
 
  *********************************************/
 async function fetchStatusWork() {
-  const url = `${getMeteorHost()}/galleryStatusWorks`;
+  const url = `${getMeteorHost()}/galleryStatusWorks?count=10`;
   const response = await axios.post(url, {}, {});
   return response.data;
 }
 
-async function executeStatusCommentMission() {
-
+async function handleStatusCommentWork(status){
   const submitUrl = `${getMeteorHost()}/submitStatusComments`;
 
-  triggetStatusTime();
-  const jo = await fetchStatusWork();
-
-  //console.log(JSON.stringify(jo,null,2));
-
-  const {status,error} = jo;
-  if(error){
-    return jo;
-  }
-  if(!status){
-    return {
-      noStatus:true,
-    }
-  }
   const {_id:statusId,
-        topicId,
-        topicName,
-        authorId:rootAuthorId,
-        authorName:rootAuthorName,
+    topicId,
+    topicName,
+    authorId:rootAuthorId,
+    authorName:rootAuthorName,
   } = status;
 
 
@@ -393,13 +378,61 @@ async function executeStatusCommentMission() {
   registerCompleteTopic(
     `${new Date().toISOString()}:${jobTitle} -- ${comments_count}  `
   );
-  updateMissionStatus({
+  const st ={
     current: jobTitle,
     status:"complete",
     comments_count,
-  });
+  }
+  updateMissionStatus(st);
 
+  console.log(`complete: ${jobTitle}`);
+  console.log(JSON.stringify(st,null,2));
   return  {}
+
+
+}
+const resolvePromisesSeq = async (tasks) => {
+  const results = [];
+  for (const task of tasks) {
+    results.push(await task);
+  }
+  return results;
+};
+
+
+async function executeStatusCommentMission() {
+
+  const _timeStart = getCurrentTimeStamp();
+  triggetStatusTime();
+  const jo = await fetchStatusWork();
+
+  //console.log(JSON.stringify(jo,null,2));
+
+  const {statusList,error} = jo;
+  if(error){
+    return jo;
+  }
+  if(!statusList){
+    return {
+      noStatus:true,
+    }
+  }
+
+  for await (const status of statusList){
+    await handleStatusCommentWork(status);
+  }
+  /*
+  const ps = statusList.map((status)=>{
+    return handleStatusCommentWork(status);
+  })
+  await sequence(ps);
+   */
+
+  const _timeEnd = getCurrentTimeStamp();
+  console.log("Jump");
+  return  {};
+
+
 
 }
 
@@ -435,6 +468,7 @@ async function startStatusCommentMission(visible){
           stopMission();
           return;
         }
+        //--->
         gStatusExecute = false;
       }).catch((err) => {
         console.error(err);

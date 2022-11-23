@@ -26,6 +26,7 @@
     "p-limit": "^4.0.0",
     "pm2": "^5.2.2",
     "prom-client": "^14.1.0",
+    "promise-sequence": "^1.0.0",
     "puppeteer": "^19.2.2"
   },
   "bugs": {

@@ -2292,6 +2292,11 @@ prom-client@^14.1.0:
   dependencies:
     tdigest "^0.1.1"
 
+promise-sequence@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/promise-sequence/-/promise-sequence-1.0.0.tgz#d9bcc907f7a26f8eabd4c461d6d5da83070c717e"
+  integrity sha512-WmQoPniJW6eu1NeoUdPjhH+1A7DK6MIX1gLnAJHxPVKiC259t+GNAa3yGvNWbX9i1eBmf4qf2nvyAWXM+bixww==
+
 promptly@^2:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/promptly/-/promptly-2.2.0.tgz#2a13fa063688a2a5983b161fff0108a07d26fc74"
