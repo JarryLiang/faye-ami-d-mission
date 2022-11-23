@@ -17,8 +17,6 @@ let _gPages = null;
 
 
 function getMeteorHost(){
-
-
   const defaultHost = "http://127.0.0.1";
   const envHost =process.env.fayehost;
   if(envHost){
@@ -430,6 +428,7 @@ async function executeStatusCommentMission() {
 
   const _timeEnd = getCurrentTimeStamp();
   console.log("Jump");
+  await sleepPromise(5000);
   return  {};
 
 
