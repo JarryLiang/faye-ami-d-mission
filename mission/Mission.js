@@ -1,5 +1,4 @@
 const bb = require("../browser_util");
-var sequence = require('promise-sequence');
 const axios = require('axios');
 
 const G_WITH_HEAD = false;
@@ -441,11 +440,18 @@ async function startStatusCommentMission(visible){
   await initBrowser(visible);
 
   /* comment no */
-  const page0 = _gPages[0];
-  gStatus.browserStatus="open douban";
-  await page0.goto("https://www.douban.com/");
-  await bb.browserApi.prepareScript(page0, "../injects/inject_status_comments.js");
-  gStatus.browserStatus="douban loaded";
+  try{
+    const page0 = _gPages[0];
+    gStatus.browserStatus="open douban";
+    await page0.goto("https://www.douban.com/");
+    await bb.browserApi.prepareScript(page0, "../injects/inject_status_comments.js");
+    gStatus.browserStatus="douban loaded";
+  }catch (e){
+    gStatus.browserStatus="open douban failed";
+    gStatus.error = e;
+    return;
+  }
+
 
 
 
