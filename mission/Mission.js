@@ -453,10 +453,7 @@ async function startStatusCommentMission(visible){
   }
 
 
-
-
   intervalHandle = setInterval(() => {
-
     if (gStatusExecute == false) {
       console.log("new Job:"+getCurrentTimeStamp());
       gStatusExecute = true;
@@ -479,11 +476,12 @@ async function startStatusCommentMission(visible){
         console.error(err);
         logError(err);
         stopMission();
+        gStatusExecute = false;
       });
     } else {
 
     }
-  }, 3000);
+  }, 1000);
 }
 
 function triggerStatusMission(){
