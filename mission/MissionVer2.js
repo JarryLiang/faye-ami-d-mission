@@ -266,7 +266,7 @@ async function missionFetchCommons() {
     await prepareDoubanAndScript(page);
 
     //===>
-    const jo = await fetchStatusWork(50);
+    const jo = await fetchStatusWork(100);
     const {statusList, error} = jo;
 
     if (error) {
