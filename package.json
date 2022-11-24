@@ -27,7 +27,8 @@
     "pm2": "^5.2.2",
     "prom-client": "^14.1.0",
     "promise-sequence": "^1.0.0",
-    "puppeteer": "^19.2.2"
+    "puppeteer": "^19.2.2",
+    "random-useragent": "^0.5.0"
   },
   "bugs": {
     "url": "https://github.com/JarryLiang/faye-ami-d-mission/issues"

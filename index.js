@@ -4,6 +4,7 @@ const _MISSION_PORT = 3000;
 const app = express()
 app.use(express.json());
 
+
 const Mission = require("./mission/Mission");
 
 const client = require('prom-client');
@@ -72,4 +73,3 @@ setTimeout(()=>{
 },10000);
 */
 
-console.log(Mission.MissionApi.getMeteorHost());

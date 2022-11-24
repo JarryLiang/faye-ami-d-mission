@@ -4,6 +4,19 @@ const fs = require('fs');
 const readline = require('readline');
 const MAX_TIMEOUT = 60 * 60 * 1000;
 
+const randomUseragent = require('random-useragent');
+
+function prepareAgent(){
+  let result = "";
+  for(let i=0;i<1000;i++){
+    const c =randomUseragent.getRandom();
+    if(c.indexOf("Mozilla")>=0){
+      result = c;
+      break;
+    }
+  }
+  return result;
+}
 
 const bright_config ={
   host:'zproxy.lum-superproxy.io:22225',
@@ -33,7 +46,8 @@ async function openBrowserWithProxy(visible) {
     //timeout: 0
   });
   const page = await browser.newPage();
-  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36');
+  const agt = prepareAgent();
+  await page.setUserAgent(agt);
   await page.authenticate({
     username: bright_config.username,
     password: bright_config.password
