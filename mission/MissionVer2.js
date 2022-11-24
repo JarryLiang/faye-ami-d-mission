@@ -93,6 +93,14 @@ function logStatistics(infos) {
 }
 
 
+async function sleepPromise(ms) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, ms)
+  })
+}
+
 function registerCompleteTopic(info) {
   gStatus.complete.push(info);
   gStatus.count = gStatus.count + 1;
@@ -240,7 +248,7 @@ async function missionFetchCommons() {
     await prepareDoubanAndScript(page);
 
     //===>
-    const jo = await fetchStatusWork(50);
+    const jo = await fetchStatusWork(100);
     const {statusList, error} = jo;
 
     if (error) {
@@ -256,7 +264,17 @@ async function missionFetchCommons() {
       i++;
       const info =  await handleStatusCommentWork(page, status);
       logInfo("status_index_in_loop",i);
+      const {count} = info;
       infos.push(info);
+      if(count>20){
+        await sleepPromise(5000);
+      }
+      if(count>15){
+        await sleepPromise(2000);
+      }
+      if(count>7){
+        await sleepPromise(1000);
+      }
     }
 
     const cs=infos.reduce((c,r)=>{
