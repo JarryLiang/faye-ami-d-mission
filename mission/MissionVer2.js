@@ -266,11 +266,15 @@ async function missionFetchCommons() {
       logInfo("status_index_in_loop",i);
       const {count} = info;
       infos.push(info);
-      if(count>20){
+
+      if(count>50){
         await sleepPromise(5000);
       }
-      if(count>15){
+      if(count>20){
         await sleepPromise(2000);
+      }
+      if(count>15){
+        await sleepPromise(1000);
       }
       if(count>7){
         await sleepPromise(1000);
