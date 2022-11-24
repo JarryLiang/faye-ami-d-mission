@@ -5,6 +5,13 @@ const readline = require('readline');
 const MAX_TIMEOUT = 60 * 60 * 1000;
 
 
+const bright_config ={
+  host:'zproxy.lum-superproxy.io:22225',
+  username:'brd-customer-hl_9a68399d-zone-doubanshare',
+  password:'bi7autuib8bq',
+}
+
+
 async function askQuestion(query) {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -17,6 +24,35 @@ async function askQuestion(query) {
   }))
 }
 
+/*************************************************************/
+async function openBrowserWithProxy(visible) {
+  const browser = await puppeteer.launch({
+    headless: !visible,
+    ignoreHTTPSErrors: true,
+    args: [`--proxy-server=${bright_config.host}`],
+    //timeout: 0
+  });
+  const page = await browser.newPage();
+  await page.authenticate({
+    username: bright_config.username,
+    password: bright_config.password
+  });
+  await page.goto('http://lumtest.com/myip.json');
+  let bodyHTML = await page.evaluate(() =>  document.documentElement.outerHTML);
+  page.setDefaultNavigationTimeout(300000);
+
+  await page.setRequestInterception(true);
+  page.on('request', (req) => {
+    if(req.resourceType() === 'image'){
+      req.abort();
+    }
+    else {
+      req.continue();
+    }
+  });
+  return {browser ,page , address:bodyHTML};
+}
+/*************************************************************/
 
 
 function getBrowserPath(){
@@ -86,6 +122,6 @@ exports.browserApi = {
     openBrowser,
     askQuestion,
     add_await_waitPromise,
-    prepareScript
-
+    prepareScript,
+    openBrowserWithProxy
 }

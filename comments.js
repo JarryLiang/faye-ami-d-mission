@@ -1,8 +1,10 @@
 const path = require('path');
 const express = require('express')
-const _MISSION_PORT = 3000;
+const _MISSION_PORT = 3002;
 const app = express()
 app.use(express.json());
+
+const MissionVer2  = require("./mission/MissionVer2");
 
 const Mission = require("./mission/Mission");
 
@@ -17,22 +19,22 @@ const guage = new client.Gauge({
 let count =1;
 
 app.get("/metrics",(req,res)=>{
-  const st=Mission.MissionApi.getMissionStatus();
+  const st=MissionVer2.run.getMissionStatus();
   const str=JSON.stringify(st,null,2)
   res.send(str);
 });
 
 
 app.post("/startStatus",(req,res)=>{
-  Mission.MissionApi.triggerStatusMission();
+  //Mission.MissionApi.triggerStatusMission();
 });
 
 app.post("/startComment",(req,res)=>{
-  Mission.MissionApi.triggerCommentMission();
+  //Mission.MissionApi.triggerCommentMission();
 });
 
 app.post("/stopMission",(req,res)=>{
-  Mission.MissionApi.stopMission();
+  //Mission.MissionApi.stopMission();
 });
 
 
@@ -49,9 +51,7 @@ app.listen(_MISSION_PORT, () => {
 
 
 setTimeout(()=>{
-
-    Mission.MissionApi.triggerCommentMission();
-
-
-},5000);
+  MissionVer2.run.triggerCommentLoop();
+  //Mission.MissionApi.triggerCommentMission();
+},1000);
 
