@@ -7,6 +7,7 @@ const G_VISIBLE = false;
 let gStatus = {
   browserStatus: "N/A",
   running_mission: null,
+  zeroComments:0,
   inLoop: false,
   missionRunning: false,
   browserAllocate:0,
@@ -23,6 +24,16 @@ let gStatus = {
   browserErrors:[],
 
 };
+
+
+function incZeroComments() {
+  gStatus.zeroComments ++;
+
+}
+
+function resetZeroComments() {
+  gStatus.zeroComments =0;
+}
 
 
 let intervalHandle = false;
@@ -139,6 +150,7 @@ async function fetchStatusWork(count) {
 }
 
 
+
 async function handleStatusCommentWork(page, status) {
   const submitUrl = `${getMeteorHost()}/submitStatusComments`;
 
@@ -181,6 +193,11 @@ async function handleStatusCommentWork(page, status) {
   let comments_count = 0;
 
   if (comments) {
+    if(comments.length==0){
+      incZeroComments();
+    }else {
+      resetZeroComments();
+    }
     const newComments = comments.map((c) => {
       const {author, ...rest} = c;
       return {
@@ -198,6 +215,7 @@ async function handleStatusCommentWork(page, status) {
     }
     await axios.post(submitUrl, toSubmit);
   } else {
+    incZeroComments();
     await axios.post(submitUrl, obj);
   }
 
