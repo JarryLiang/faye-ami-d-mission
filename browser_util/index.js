@@ -33,6 +33,7 @@ async function openBrowserWithProxy(visible) {
     //timeout: 0
   });
   const page = await browser.newPage();
+  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36');
   await page.authenticate({
     username: bright_config.username,
     password: bright_config.password
