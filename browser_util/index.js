@@ -20,8 +20,8 @@ function prepareAgent(){
 
 const bright_config ={
   host:'zproxy.lum-superproxy.io:22225',
-  username:'brd-customer-hl_9a68399d-zone-doubanshare',
-  password:'bi7autuib8bq',
+  username:'brd-customer-hl_9a68399d-zone-residential',
+  password:'4uldcqvcvm7x',
 }
 
 

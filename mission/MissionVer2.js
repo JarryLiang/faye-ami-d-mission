@@ -2,7 +2,7 @@ const bb = require("../browser_util");
 const axios = require('axios');
 const maxErrorCount = 10;
 
-const G_VISIBLE = false;
+const G_VISIBLE = true;
 
 let gStatus = {
   browserStatus: "N/A",
@@ -183,7 +183,7 @@ async function handleStatusCommentWork(page, status) {
     id: statusId,
     maxComments: 1000,
     _cond: {
-      doDebug: false
+      doDebug: true
     }
   });
 
