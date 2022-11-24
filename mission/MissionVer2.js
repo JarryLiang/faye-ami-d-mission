@@ -2,7 +2,7 @@ const bb = require("../browser_util");
 const axios = require('axios');
 const maxErrorCount = 10;
 
-const G_VISIBLE = true;
+const G_VISIBLE = false;
 
 let gStatus = {
   browserStatus: "N/A",
