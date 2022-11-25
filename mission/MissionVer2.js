@@ -243,12 +243,11 @@ async function handleStatusCommentWork(page, status) {
 async function prepareDoubanAndScript(page){
   logInfo("browserStatus","open douban");
   try{
-    await page.goto("https://www.douban.com/",{waitUntil: 'load', timeout: 60000});
+    await page.goto("https://www.douban.com/",{waitUntil: 'load'});
   }catch (e){
     logBrowserError(e);
     throw e;
   }
-
   logInfo("browserStatus","douban loaded");
   await bb.browserApi.prepareScript(page, "../injects/inject_status_comments.js");
   logInfo("browserStatus","script injected");
@@ -267,7 +266,7 @@ async function missionFetchCommons() {
     await prepareDoubanAndScript(page);
 
     //===>
-    const jo = await fetchStatusWork(100);
+    const jo = await fetchStatusWork(50);
     const {statusList, error} = jo;
 
     if (error) {
@@ -290,10 +289,11 @@ async function missionFetchCommons() {
         await sleepPromise(5000);
       }else {
         if(count>20){
-          await sleepPromise(1000);
-        }
-        if(count>10){
-          await sleepPromise(1000);
+          await sleepPromise(2000);
+        }else {
+          if(count>10){
+            await sleepPromise(1000);
+          }
         }
       }
     }
