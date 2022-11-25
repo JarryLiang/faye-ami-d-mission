@@ -1,7 +1,7 @@
 const bb = require("../browser_util");
 const axios = require('axios');
 
-const G_WITH_HEAD = false;
+const G_WITH_HEAD = true;
 
 let intervalHandle = null;
 let gTopicExecute = false;

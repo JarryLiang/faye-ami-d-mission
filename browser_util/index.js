@@ -54,7 +54,6 @@ async function openBrowserWithProxy(visible) {
   });
   await page.goto('http://lumtest.com/myip.json');
   let bodyHTML = await page.evaluate(() =>  document.documentElement.outerHTML);
-  page.setDefaultNavigationTimeout(60000);
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     if(req.resourceType() === 'image'){

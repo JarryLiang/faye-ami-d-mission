@@ -260,13 +260,14 @@ async function missionFetchCommons() {
   //===>create !!
   logInfo("browserStatus","\"prepare browser");
   const {browser, page , address} = await bb.browserApi.openBrowserWithProxy(G_VISIBLE);
+  page.setDefaultNavigationTimeout(120000);
   incBrowserAllocate();
   logInfo("ProxyAddress",address);
   try {
     await prepareDoubanAndScript(page);
 
     //===>
-    const jo = await fetchStatusWork(50);
+    const jo = await fetchStatusWork(100);
     const {statusList, error} = jo;
 
     if (error) {
@@ -289,10 +290,10 @@ async function missionFetchCommons() {
         await sleepPromise(5000);
       }
       if(count>20){
-        await sleepPromise(5000);
+        await sleepPromise(1000);
       }
       if(count>10){
-        await sleepPromise(2000);
+        await sleepPromise(1000);
       }
     }
 
@@ -341,7 +342,7 @@ function triggerCommentLoop() {
   gStatus.inLoop = true;
   intervalHandle = setInterval(() => {
       loopJobOfCommentPromise();
-  }, 5000);
+  }, 2000);
 }
 
 
