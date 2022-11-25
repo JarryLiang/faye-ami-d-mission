@@ -285,17 +285,18 @@ async function missionFetchCommons() {
       const {count} = info;
       infos.push(info);
 
-      if(count>50){
-        await sleepPromise(5000);
-      }else {
-        if(count>20){
-          await sleepPromise(2000);
-        }else {
-          if(count>10){
-            await sleepPromise(1000);
-          }
-        }
-      }
+      await sleepPromise(1000);
+      // if(count>50){
+      //   await sleepPromise(5000);
+      // }else {
+      //   if(count>20){
+      //     await sleepPromise(2000);
+      //   }else {
+      //     if(count>10){
+      //       await sleepPromise(1000);
+      //     }
+      //   }
+      // }
     }
 
     const cs=infos.reduce((c,r)=>{
