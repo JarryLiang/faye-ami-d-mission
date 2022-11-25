@@ -288,12 +288,13 @@ async function missionFetchCommons() {
 
       if(count>50){
         await sleepPromise(5000);
-      }
-      if(count>20){
-        await sleepPromise(1000);
-      }
-      if(count>10){
-        await sleepPromise(1000);
+      }else {
+        if(count>20){
+          await sleepPromise(1000);
+        }
+        if(count>10){
+          await sleepPromise(1000);
+        }
       }
     }
 
