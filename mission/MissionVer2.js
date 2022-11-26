@@ -195,9 +195,8 @@ async function handleStatusCommentWork(page, status) {
   if (comments) {
     if(comments.length==0){
       incZeroComments();
-    }else {
-      resetZeroComments();
     }
+
     const newComments = comments.map((c) => {
       const {author, ...rest} = c;
       return {
