@@ -151,6 +151,7 @@ async function executeTopicStatusMission() {
 
     const url = `${getMeteorHost()}/submitGalleryTopicWorks`;
 
+    const closeTopicUrl = `${getMeteorHost()}/submitCloseTopicWorks`;
 
     let cond = {};
 
@@ -161,12 +162,18 @@ async function executeTopicStatusMission() {
 
     const {name:topicName} = topic;
 
+    let latestSubmit = {
+
+    }
+
+    let batch_total = 0;
+
     for (let i = 0; i < 100; i++) {
       triggetStatusTime();
       console.log(`loop i ${i}`);
       const obj = await page0.evaluate(async (opts) => {
         const {id,_cond} = opts;
-        return injectFetchTopicItems(id, "2021/06/01", _cond);
+        return injectFetchTopicItems(id, "2021/03/01", _cond);
       }, {
         id:topic._id,
         _cond:cond
@@ -208,6 +215,8 @@ async function executeTopicStatusMission() {
           msg
         });
         await axios.post(url, toSubmit);
+        //close ==>
+        await axios.post(closeTopicUrl,toSubmit);
         return;
       }
 
@@ -230,6 +239,9 @@ async function executeTopicStatusMission() {
         count:  _cc
       }
 
+      latestSubmit= {
+        ...toSubmit
+      }
       console.log(`post ${url}`);
       await axios.post(url, toSubmit);
       console.log(`post -complete ${url} `);
@@ -248,8 +260,6 @@ async function executeTopicStatusMission() {
           timeOut,
           job:"inprocess"
         });
-
-
       } else {
         registerCompleteTopic(
           `${new Date().toISOString()}:${jobTitle} - ${totalStatus}  `
@@ -257,6 +267,11 @@ async function executeTopicStatusMission() {
         break;
       }
     }
+    //--->close ==>
+    latestSubmit.count = totalStatus;
+    await axios.post(closeTopicUrl,latestSubmit);
+
+
     updateMissionStatus({
       current: jobTitle,
       job:"complete"
