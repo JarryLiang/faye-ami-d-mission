@@ -172,6 +172,7 @@ async function handleFetchTopic(page, topic){
       break;
     }
   }
+
   latestSubmit.count = totalStatus;
   await axios.post(closeTopicUrl, latestSubmit);
 
