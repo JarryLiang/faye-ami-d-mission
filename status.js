@@ -4,7 +4,8 @@ const _MISSION_PORT = 3000;
 const app = express()
 app.use(express.json());
 
-const Mission = require("./mission/Mission");
+const Mission = require("./mission/MissionStatus");
+
 
 const client = require('prom-client');
 
@@ -17,23 +18,11 @@ const guage = new client.Gauge({
 let count =1;
 
 app.get("/metrics",(req,res)=>{
-  const st=Mission.MissionApi.getMissionStatus();
+  const  st =Mission.StatusApi.getMissionStatus()
   const str=JSON.stringify(st,null,2)
   res.send(str);
 });
 
-
-app.post("/startStatus",(req,res)=>{
-  Mission.MissionApi.triggerStatusMission();
-});
-
-app.post("/startComment",(req,res)=>{
-  Mission.MissionApi.triggerCommentMission();
-});
-
-app.post("/stopMission",(req,res)=>{
-  Mission.MissionApi.stopMission();
-});
 
 
 
@@ -45,7 +34,6 @@ app.get("/",(req,res)=>{
 
 
 
-
 app.listen(_MISSION_PORT, () => {
   console.log(`Example app listening on port ${_MISSION_PORT}`)
 });
@@ -53,6 +41,6 @@ app.listen(_MISSION_PORT, () => {
 
 
 setTimeout(()=>{
-  Mission.MissionApi.triggerStatusMission();
-},5000);
+  Mission.StatusApi.startLoop();
+},1000);
 
