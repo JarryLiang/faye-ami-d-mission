@@ -6,7 +6,6 @@ app.use(express.json());
 
 const MissionVer2  = require("./mission/MissionVer2");
 
-const Mission = require("./mission/Mission");
 
 const client = require('prom-client');
 
