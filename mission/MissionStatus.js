@@ -254,7 +254,7 @@ function startRunTopicMission() {
   intervalHandle = setInterval(() => {
     if (gTopicExecute === false) {
       gTopicExecute = true;
-      executeTopicMissionGroup(3).then(() => {
+      executeTopicMissionGroup(20).then(() => {
 
       }).catch((err) => {
         logGlobalStatus("MissionGroupError", err);
