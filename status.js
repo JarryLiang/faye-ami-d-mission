@@ -18,7 +18,6 @@ const guage = new client.Gauge({
 let count =1;
 
 app.get("/metrics",(req,res)=>{
-
   const  st =Mission.StatusApi.getMissionStatus()
   const str=JSON.stringify(st,null,2)
   res.send(str);
