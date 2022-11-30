@@ -38,7 +38,7 @@ async function askQuestion(query) {
 }
 
 /*************************************************************/
-async function openBrowserWithProxy(visible) {
+async function openBrowserWithProxy(visible,openAddress) {
   const browser = await puppeteer.launch({
     headless: !visible,
     ignoreHTTPSErrors: true,
@@ -52,8 +52,19 @@ async function openBrowserWithProxy(visible) {
     username: bright_config.username,
     password: bright_config.password
   });
-  await page.goto('http://lumtest.com/myip.json');
-  let bodyHTML = await page.evaluate(() =>  document.documentElement.outerHTML);
+
+  let address = {result:"No fetch"};
+  if(openAddress) {
+    await page.goto('http://lumtest.com/myip.json');
+    const jos = await page.evaluate(() =>  document.body.innerText);
+    const jo= JSON.parse(jos);
+    const {ip,country} = jo;
+
+    address= {
+      ip,country
+    }
+    console.log(address);
+  }
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     if(req.resourceType() === 'image'){
@@ -63,7 +74,7 @@ async function openBrowserWithProxy(visible) {
       req.continue();
     }
   });
-  return {browser ,page , address:bodyHTML};
+  return {browser ,page , address:address};
 }
 /*************************************************************/
 

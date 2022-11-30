@@ -4,8 +4,10 @@ const _MISSION_PORT = 3000;
 const app = express()
 app.use(express.json());
 
-const MissionVer2  = require("./mission/MissionVer2");
 
+const missinSize = 5;
+
+const MissionVer2  = require("./mission/MissionVer2");
 
 const client = require('prom-client');
 
@@ -24,17 +26,6 @@ app.get("/metrics",(req,res)=>{
 });
 
 
-app.post("/startStatus",(req,res)=>{
-  //Mission.MissionApi.triggerStatusMission();
-});
-
-app.post("/startComment",(req,res)=>{
-  //Mission.MissionApi.triggerCommentMission();
-});
-
-app.post("/stopMission",(req,res)=>{
-  //Mission.MissionApi.stopMission();
-});
 
 
 
@@ -50,7 +41,19 @@ app.listen(_MISSION_PORT, () => {
 
 
 setTimeout(()=>{
-  MissionVer2.run.triggerCommentLoop();
+  const ms=[];
+
+
+
+
+  for(let i=0;i<missinSize;i++){
+    ms.push(`mission_${i}`);
+  }
+
+  for(const m of ms){
+    MissionVer2.run.triggerCommentLoop(m);
+  }
+
   //Mission.MissionApi.triggerCommentMission();
 },1000);
 

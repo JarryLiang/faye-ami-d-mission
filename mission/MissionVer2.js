@@ -2,7 +2,15 @@ const bb = require("../browser_util");
 const axios = require('axios');
 const maxErrorCount = 10;
 
-const G_VISIBLE = false;
+
+
+const doLocal = false
+
+
+;
+const G_WITH_HEAD = doLocal ? true : false;
+const G_STATUS_BATCH_SIZE = doLocal ? 10 : 50;
+
 
 let gStatus = {
   browserStatus: "N/A",
@@ -25,14 +33,31 @@ let gStatus = {
 
 };
 
-
-function incZeroComments() {
-  gStatus.zeroComments ++;
+let missionPool = {
 
 }
 
-function resetZeroComments() {
-  gStatus.zeroComments =0;
+
+function getMissionPool(missionId, fieldName) {
+  if(!missionPool[missionId]){
+    return undefined;
+  }
+  return missionPool[missionId][fieldName];
+}
+
+
+function setMissionPool(missionId, fieldName, fieldValue) {
+
+  if(!missionPool[missionId]){
+    missionPool[missionId]={}
+  }
+  missionPool[missionId][fieldName]=fieldValue;
+}
+
+
+function incZeroComments(missionId,) {
+  const v = getMissionPool(missionId,"zeroComments")||0;
+  setMissionPool(missionId,"zeroComments",v+1);
 }
 
 
@@ -54,37 +79,40 @@ function getMissionStatus(){
     time,
     complete:complete.slice(-100).reverse(),
     infos:infos.slice(-100).reverse(),
-
+    missionPool,
   }
 }
 
-function stopMission() {
-  if (intervalHandle) {
-    clearInterval(intervalHandle);
-    intervalHandle = null;
-    gStatus.inLoop = false;
+function stopMission(missionId) {
+
+  const handle =getMissionPool(missionId,"intervalHandle");
+
+  if (handle) {
+    clearInterval(handle);
+    setMissionPool(missionId,"intervalHandle",null);
+    setMissionPool(missionId,"inLoop",false);
   }
 }
 
-function incBrowserAllocate(){
- gStatus.browserAllocate ++;
-}
-function logResetErrorCount() {
-  gStatus.errorPeak = 0;
+function incBrowserAllocate(missionId){
+  incMissionValue(missionId,"browserAllocate");
 }
 
-function logIncErrorCount(){
-  gStatus.errorPeak +=1;
-  if(gStatus.errorPeak > maxErrorCount){
-    stopMission();
+function logIncErrorCount(missionId){
+  incMissionValue(missionId,"errorPeak");
+  const v = getMissionPool(missionId,"errorPeak");
+  if(v>maxErrorCount) {
+   stopMission(missionId);
   }
 }
 
-function logBrowserError(e) {
-  gStatus.browserErrors.push(e);
-  if(gStatus.browserErrors.length>maxErrorCount){
-    stopMission();
+function logBrowserError(missionId,e) {
+  pushMissionValue(missionId,"browserError",e);
+  const errors =getMissionPool(missionId,"browserError");
+  if(errors.length > maxErrorCount){
+    stopMission(missionId);
   }
+
 }
 function logInfo(keyName, value) {
   gStatus[keyName]=value;
@@ -112,14 +140,26 @@ async function sleepPromise(ms) {
   })
 }
 
-function registerCompleteTopic(info) {
-  gStatus.complete.push(info);
-  gStatus.count = gStatus.count + 1;
+function incMissionValue(missionId, fieldName) {
+  const v= getMissionPool(missionId,fieldName) || 0;
+  setMissionPool(missionId,fieldName,v+1);
 }
 
-function logPromiseMissionError(err) {
-  gStatus.errors.push(JSON.stringify(err,null,2));
-  logIncErrorCount();
+function pushMissionValue(missionId, fieldName, info) {
+  const v= getMissionPool(missionId,fieldName) ||[];
+  v.push(info);
+  setMissionPool(missionId,fieldName,v);
+}
+
+function registerCompleteTopic(missionId,info) {
+  incMissionValue(missionId,"count");
+  pushMissionValue(missionId,"complete",info);
+
+}
+
+function logPromiseMissionError(missionId,err) {
+  pushMissionValue(missionId,"errors",err);
+  logIncErrorCount(missionId);
 }
 
 
@@ -129,9 +169,9 @@ function updateMissionStatus(info) {
 }
 
 
-function triggetStatusTime() {
-  gStatus.timeStr = new Date().toISOString();
-  gStatus.time = new Date().getTime();
+function triggetStatusTime(missionId) {
+  setMissionPool(missionId,"timeStr",new Date().toISOString());
+  setMissionPool(missionId,"time",new Date().getTime());
 }
 
 function getMeteorHost() {
@@ -151,7 +191,7 @@ async function fetchStatusWork(count) {
 
 
 
-async function handleStatusCommentWork(page, status) {
+async function handleStatusCommentWork(missionId, page, status,ip) {
   const submitUrl = `${getMeteorHost()}/submitStatusComments`;
 
   const {
@@ -162,13 +202,14 @@ async function handleStatusCommentWork(page, status) {
     authorName: rootAuthorName,
   } = status;
 
-
   const doubanUrl = `https://www.douban.com/people/${rootAuthorId}/status/${statusId}`;
-  console.log(doubanUrl);
+
+  setMissionPool(missionId,"doubanUrl",doubanUrl);
 
 
   const jobTitle = `[Status Ccmment] ${statusId}`;
-  updateMissionStatus({
+
+  setMissionPool(missionId,"info",{
     current: jobTitle,
     step: 0,
     status: "init"
@@ -187,14 +228,14 @@ async function handleStatusCommentWork(page, status) {
     }
   });
 
-  triggetStatusTime();
+  triggetStatusTime(missionId);
 
   const {comments} = obj;
   let comments_count = 0;
 
   if (comments) {
     if(comments.length==0){
-      incZeroComments();
+      incZeroComments(missionId);
     }
 
     const newComments = comments.map((c) => {
@@ -209,16 +250,17 @@ async function handleStatusCommentWork(page, status) {
     });
     comments_count = comments.length;
     const toSubmit = {
+      ip,
       ...obj,
       comments: newComments,
     }
     await axios.post(submitUrl, toSubmit);
   } else {
-    incZeroComments();
+    incZeroComments(missionId);
     await axios.post(submitUrl, obj);
   }
 
-  registerCompleteTopic(
+  registerCompleteTopic(missionId,
     `${new Date().toISOString()}:${jobTitle} -- ${comments_count}  `
   );
 
@@ -227,8 +269,9 @@ async function handleStatusCommentWork(page, status) {
     status: "complete",
     comments_count,
   }
-  updateMissionStatus(st);
-  console.log(`complete: ${jobTitle}`);
+  setMissionPool(missionId,"info",st);
+
+  console.log(`complete:${missionId} - ${jobTitle}`);
   console.log(JSON.stringify(st, null, 2));
   return {
     doubanUrl,
@@ -239,33 +282,41 @@ async function handleStatusCommentWork(page, status) {
 
 
 
-async function prepareDoubanAndScript(page){
-  logInfo("browserStatus","open douban");
+async function prepareDoubanAndScript(missionId,page){
+
   try{
     await page.goto("https://www.douban.com/",{waitUntil: 'load'});
   }catch (e){
-    logBrowserError(e);
+    logBrowserError(missionId,e);
     throw e;
   }
-  logInfo("browserStatus","douban loaded");
+  setMissionPool(missionId,"browserStatus","douban loaded");
   await bb.browserApi.prepareScript(page, "../injects/inject_status_comments.js");
-  logInfo("browserStatus","script injected");
+  setMissionPool(missionId,"browserStatus","script injected");
 }
 
 
 
-async function missionFetchCommons() {
+async function missionFetchCommons(missionId) {
   //===>create !!
-  logInfo("browserStatus","\"prepare browser");
-  const {browser, page , address} = await bb.browserApi.openBrowserWithProxy(G_VISIBLE);
+
+  setMissionPool(missionId,"browserStatus","prepare browser");
+  const {browser, page , address} = await bb.browserApi.openBrowserWithProxy(G_WITH_HEAD,true);
+  const {ip} = address;
+  if(!ip){
+    stopMission(missionId);
+  }
   page.setDefaultNavigationTimeout(120000);
-  incBrowserAllocate();
-  logInfo("ProxyAddress",address);
+  incBrowserAllocate(missionId);
+  console.log("allocate browser");
+  setMissionPool(missionId,"ProxyAddress",address);
+
+  setMissionPool(missionId,"",address);
   try {
-    await prepareDoubanAndScript(page);
+    await prepareDoubanAndScript(missionId,page);
 
     //===>
-    const jo = await fetchStatusWork(50);
+    const jo = await fetchStatusWork(G_STATUS_BATCH_SIZE);
     const {statusList, error} = jo;
 
     if (error) {
@@ -279,23 +330,9 @@ async function missionFetchCommons() {
     let i=0;
     for await (const status of statusList) {
       i++;
-      const info =  await handleStatusCommentWork(page, status);
-      logInfo("status_index_in_loop",i);
-      const {count} = info;
+      const info =  await handleStatusCommentWork(missionId,page, status,ip);
+      setMissionPool(missionId,"status_index_in_loop","i");
       infos.push(info);
-
-      await sleepPromise(1000);
-      // if(count>50){
-      //   await sleepPromise(5000);
-      // }else {
-      //   if(count>20){
-      //     await sleepPromise(2000);
-      //   }else {
-      //     if(count>10){
-      //       await sleepPromise(1000);
-      //     }
-      //   }
-      // }
     }
 
     const cs=infos.reduce((c,r)=>{
@@ -304,7 +341,7 @@ async function missionFetchCommons() {
     },0)
 
     if(cs>0){
-      logResetErrorCount();
+      setMissionPool(missionId,"errorPeak",0);
     }
 
     //close browser
@@ -312,38 +349,44 @@ async function missionFetchCommons() {
     logStatistics(infos);
     return {};
   } catch (e) {
-    logInfo("mission_error",e);
+    setMissionPool(missionId,"mission_error",e);
     await browser.close();
     throw e;
   }
 
 }
 
-function loopJobOfCommentPromise(){
-  if (gStatus.missionRunning==false) {
-    gStatus.missionRunning = true;
-    missionFetchCommons().then(({err}) => {
+function loopJobOfCommentPromise(missionId){
+
+  if(!getMissionPool(missionId,"missionRunning")){
+    setMissionPool(missionId,"missionRunning",true);
+    missionFetchCommons(missionId).then(({err}) => {
       if (err) {
-        logPromiseMissionError(err)
+        setMissionPool(missionId,"PromiseMissionError",err);
+        logPromiseMissionError(missionId,err)
       }
     }).catch((e) => {
       logPromiseMissionError(e);
+      setMissionPool(missionId,"PromiseMissionError",e);
     }).finally(() => {
-      gStatus.missionRunning = false;
+      setMissionPool(missionId,"missionRunning",false);
       //destory browser every loop
     });
   }
 }
 
+
 /*********************************************************
  *
  *
  ********************************************************/
-function triggerCommentLoop() {
-  gStatus.inLoop = true;
-  intervalHandle = setInterval(() => {
-      loopJobOfCommentPromise();
-  }, 2000);
+function triggerCommentLoop(missionId) {
+  setMissionPool(missionId,"inLoop",true);
+    handle = setInterval(() => {
+      loopJobOfCommentPromise(missionId);
+  }, 1000);
+
+  setMissionPool(missionId,"intervalHandle",handle);
 }
 
 
